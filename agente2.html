@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FODA y plan 90 días — Agente encadenado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --border: #e2e6ed;
+      --accent: #1565c0;
+      --accent-hover: #0d47a1;
+      --accent-soft: #e3f2fd;
+      --step2: #2e7d32;
+      --step2-soft: #e8f5e9;
+      --danger: #b00020;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(26, 29, 38, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      background-image: radial-gradient(ellipse 120% 80% at 50% -20%, #c8e6c9 0%, transparent 50%);
+    }
+
+    .wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.45rem, 4vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 36rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .flow-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 1rem;
+      padding: 0.35rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      font: inherit;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafbfc;
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--surface);
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    .row-model {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .row-model select { max-width: 240px; }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1.25rem;
+    }
+
+    button[type="submit"] {
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    button[type="submit"]:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .status {
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    .status.visible { display: flex; }
+
+    .status-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-step.done { color: var(--step2); }
+
+    .status-step.active { color: var(--accent); font-weight: 600; }
+
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    .status-step.active .spinner {
+      display: block;
+    }
+
+    .check {
+      display: none;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--step2);
+      font-size: 14px;
+      line-height: 16px;
+    }
+
+    .status-step.done .check { display: block; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error {
+      display: none;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      background: #ffebee;
+      color: var(--danger);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .error.visible { display: block; }
+
+    #results { display: none; }
+
+    #results.visible { display: block; }
+
+    .result-block {
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fafbfc;
+    }
+
+    .result-block:last-child { margin-bottom: 0; }
+
+    .result-block h3 {
+      margin: 0 0 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .result-block.foda h3 { color: var(--accent); }
+
+    .result-block.plan h3 { color: var(--step2); }
+
+    .result-body {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: #2a2f3a;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 2rem auto 0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Análisis FODA y plan de 90 días</h1>
+      <p>Dos pasos automáticos: primero un FODA completo para tu negocio; en seguida, un plan de acción trimestral basado en ese análisis.</p>
+      <div class="flow-badge" aria-hidden="true">Paso 1 → FODA · Paso 2 → Plan (sin clic extra)</div>
+    </header>
+
+    <form class="card" id="form" novalidate>
+      <h2>Datos</h2>
+
+      <div class="field">
+        <label for="negocio">Nombre del negocio</label>
+        <input type="text" id="negocio" name="negocio" required placeholder="Ej. Panadería El Horno, TechFix SL…" autocomplete="organization" />
+      </div>
+
+      <div class="field">
+        <label for="apiKey">API key de Gemini (opcional si ya está guardada)</label>
+        <input type="password" id="apiKey" name="apiKey" placeholder="Dejar vacío para usar la clave por defecto del archivo" autocomplete="off" />
+        <p class="hint">Misma configuración que en <code>index.html</code> (<code>GEMINI_API_KEY_DEFAULT</code>).</p>
+      </div>
+
+      <div class="field row-model">
+        <label for="modelo" style="margin-bottom:0">Modelo</label>
+        <select id="modelo" name="modelo" aria-label="Modelo de Gemini">
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="btn">Analizar y planificar</button>
+        <div class="status" id="status" aria-live="polite">
+          <div class="status-step" id="step1Row">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="check" aria-hidden="true">✓</span>
+            <span>Paso 1: generando análisis FODA…</span>
+          </div>
+          <div class="status-step" id="step2Row">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="check" aria-hidden="true">✓</span>
+            <span>Paso 2: generando plan de 90 días…</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error" id="error" role="alert"></div>
+    </form>
+
+    <section class="card" id="results" aria-live="polite">
+      <h2>Resultado</h2>
+      <div class="result-block foda">
+        <h3>1. Análisis FODA</h3>
+        <div class="result-body" id="outFoda"></div>
+      </div>
+      <div class="result-block plan">
+        <h3>2. Plan de acción — 90 días</h3>
+        <div class="result-body" id="outPlan"></div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Los análisis son orientativos y pueden incluir supuestos si el nombre del negocio no da mucho contexto. Revísalos siempre antes de tomar decisiones.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      /** Misma referencia que en index.html */
+      var GEMINI_API_KEY_DEFAULT = "AIzaSyDIzMpYQ1Bv8xYzc54u2n0tmFSulml3mhc";
+
+      var form = document.getElementById("form");
+      var btn = document.getElementById("btn");
+      var statusEl = document.getElementById("status");
+      var step1Row = document.getElementById("step1Row");
+      var step2Row = document.getElementById("step2Row");
+      var errorEl = document.getElementById("error");
+      var results = document.getElementById("results");
+      var outFoda = document.getElementById("outFoda");
+      var outPlan = document.getElementById("outPlan");
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.classList.add("visible");
+      }
+
+      function clearError() {
+        errorEl.textContent = "";
+        errorEl.classList.remove("visible");
+      }
+
+      function setStep1(active, done) {
+        step1Row.classList.toggle("active", !!active);
+        step1Row.classList.toggle("done", !!done);
+      }
+
+      function setStep2(active, done) {
+        step2Row.classList.toggle("active", !!active);
+        step2Row.classList.toggle("done", !!done);
+      }
+
+      function callGemini(apiKey, model, userText) {
+        var url =
+          "https://generativelanguage.googleapis.com/v1beta/models/" +
+          encodeURIComponent(model) +
+          ":generateContent?key=" +
+          encodeURIComponent(apiKey);
+
+        var body = {
+          contents: [{ role: "user", parts: [{ text: userText }] }],
+          generationConfig: {
+            temperature: 0.65,
+            maxOutputTokens: 8192
+          }
+        };
+
+        return fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        }).then(function (res) {
+          return res.json().then(function (data) {
+            if (!res.ok) {
+              var msg =
+                (data && data.error && data.error.message) ||
+                "Error HTTP " + res.status;
+              throw new Error(msg);
+            }
+            var cand = data.candidates && data.candidates[0];
+            var parts = cand && cand.content && cand.content.parts;
+            var text = parts && parts[0] && parts[0].text;
+            if (!text) {
+              throw new Error(
+                "La API no devolvió texto. Prueba otro modelo o revisa la respuesta."
+              );
+            }
+            return text.trim();
+          });
+        });
+      }
+
+      function promptFoda(nombreNegocio) {
+        return (
+          "Eres consultor de estrategia empresarial senior. Elabora un análisis FODA (matriz SWOT) completo en español para el negocio indicado.\n\n" +
+          "Si el nombre no basta para conocer el sector, infiere el tipo de negocio más probable y, en una sola frase al inicio, indica brevemente el supuesto (ej. \"Supuesto: negocio de restauración local\").\n\n" +
+          "Estructura obligatoria. Usa exactamente estos cuatro títulos en una línea cada uno, en mayúsculas:\n" +
+          "FORTALEZAS\n" +
+          "DEBILIDADES\n" +
+          "OPORTUNIDADES\n" +
+          "AMENAZAS\n\n" +
+          "Bajo cada título, incluye entre 4 y 6 ítems. Cada ítem en una línea nueva, empezando con guión y espacio (- ). Sé concreto, profesional y objetivo. No repitas el mismo ítem en dos cuadrantes.\n\n" +
+          "Negocio: \"" + nombreNegocio + "\""
+        );
+      }
+
+      function promptPlan(fodaText) {
+        return (
+          "Eres consultor de estrategia y ejecución. Tienes debajo el análisis FODA de un negocio (en español).\n\n" +
+          "Tarea: sin copiar el FODa entero, elabora un plan de acción para los próximos 90 días en español, tono ejecutivo y claro.\n\n" +
+          "Requisitos:\n" +
+          "- Organiza en tres fases: \"Días 1-30\", \"Días 31-60\" y \"Días 61-90\". Cada fase con un subtítulo en una línea.\n" +
+          "- En cada fase, lista acciones concretas con guión (- ), priorizando impacto y viabilidad según el FODA.\n" +
+          "- Al final, una sección \"SEGUIMIENTO\" con 3 a 5 indicadores o revisiones sugeridas (sin inventar cifras ni porcentajes que no puedas justificar).\n" +
+          "- No uses markdown ni negritas con asteriscos; texto plano legible.\n\n" +
+          "--- FODA ---\n" +
+          fodaText +
+          "\n--- FIN FODA ---"
+        );
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        clearError();
+
+        var nombre = document.getElementById("negocio").value.trim();
+        var apiKey =
+          document.getElementById("apiKey").value.trim() ||
+          GEMINI_API_KEY_DEFAULT;
+        var modelo = document.getElementById("modelo").value;
+
+        if (!nombre) {
+          showError("Escribe el nombre del negocio.");
+          return;
+        }
+        if (!apiKey) {
+          showError("Configura GEMINI_API_KEY_DEFAULT o introduce una API key.");
+          return;
+        }
+
+        btn.disabled = true;
+        results.classList.remove("visible");
+        outFoda.textContent = "";
+        outPlan.textContent = "";
+
+        statusEl.classList.add("visible");
+        setStep1(true, false);
+        setStep2(false, false);
+
+        callGemini(apiKey, modelo, promptFoda(nombre))
+          .then(function (foda) {
+            outFoda.textContent = foda;
+            results.classList.add("visible");
+            setStep1(false, true);
+            setStep2(true, false);
+            return callGemini(apiKey, modelo, promptPlan(foda));
+          })
+          .then(function (plan) {
+            outPlan.textContent = plan;
+            setStep2(false, true);
+            results.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          })
+          .catch(function (err) {
+            showError(err.message || "Error al generar el contenido.");
+            if (outFoda.textContent) {
+              results.classList.add("visible");
+              outPlan.textContent =
+                "(No se pudo generar el plan automáticamente. Revisa el error o inténtalo de nuevo.)";
+            }
+          })
+          .finally(function () {
+            btn.disabled = false;
+            step1Row.classList.remove("active");
+            step2Row.classList.remove("active");
+            step1Row.classList.toggle("done", !!outFoda.textContent);
+            var planOk =
+              !!outPlan.textContent &&
+              outPlan.textContent.indexOf("(No se pudo") !== 0;
+            step2Row.classList.toggle("done", planOk);
+            if (planOk || !outFoda.textContent) {
+              statusEl.classList.remove("visible");
+            } else {
+              statusEl.classList.add("visible");
+            }
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

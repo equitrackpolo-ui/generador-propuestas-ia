@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generador de propuestas comerciales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --border: #e2e6ed;
+      --accent: #0d47a1;
+      --accent-hover: #0a3d8a;
+      --accent-soft: #e3f2fd;
+      --danger: #b00020;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(26, 29, 38, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      background-image: radial-gradient(ellipse 120% 80% at 50% -20%, #dbeafe 0%, transparent 55%);
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      font: inherit;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fafbfc;
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--surface);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .field {
+      margin-bottom: 1.1rem;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    button[type="submit"] {
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    button[type="submit"]:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .model-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .model-row select {
+      max-width: 220px;
+    }
+
+    .output-card {
+      display: none;
+    }
+
+    .output-card.visible {
+      display: block;
+    }
+
+    .output-card h2 {
+      margin-bottom: 1rem;
+    }
+
+    .proposal {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #2a2f3a;
+    }
+
+    .proposal p {
+      margin: 0 0 1.1em;
+    }
+
+    .proposal p:last-child {
+      margin-bottom: 0;
+    }
+
+    .error {
+      display: none;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      background: #ffebee;
+      color: var(--danger);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .loading.visible {
+      display: flex;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    footer a {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Generador de propuestas comerciales</h1>
+      <p>Describe al cliente y el contexto; obtendrás un borrador profesional en tres párrafos.</p>
+    </header>
+
+    <form class="card" id="form" novalidate>
+      <h2>Datos del encargo</h2>
+
+      <div class="field">
+        <label for="cliente">Nombre del cliente o empresa</label>
+        <input type="text" id="cliente" name="cliente" required placeholder="Ej. Acme Industrial S.L." autocomplete="organization" />
+      </div>
+
+      <div class="field">
+        <label for="industria">Industria o sector</label>
+        <input type="text" id="industria" name="industria" required placeholder="Ej. logística, retail, salud…" />
+      </div>
+
+      <div class="field">
+        <label for="problema">Problema principal a resolver</label>
+        <textarea id="problema" name="problema" required placeholder="Describe el reto, la urgencia o la oportunidad que quieres abordar en la propuesta."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="apiKey">API key de Google AI (Gemini)</label>
+        <input type="password" id="apiKey" name="apiKey" required placeholder="Pega tu clave de Google AI Studio" autocomplete="off" />
+        <p class="hint">Obtén una clave en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>. La clave se usa solo en tu navegador para esta petición.</p>
+      </div>
+
+      <div class="field model-row">
+        <label for="modelo" style="margin-bottom:0">Modelo</label>
+        <select id="modelo" name="modelo" aria-label="Modelo de Gemini">
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="btnGenerar">Generar propuesta</button>
+        <div class="loading" id="loading" aria-live="polite">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Redactando propuesta…</span>
+        </div>
+      </div>
+
+      <div class="error" id="error" role="alert"></div>
+    </form>
+
+    <section class="card output-card" id="outputCard" aria-live="polite">
+      <h2>Propuesta generada</h2>
+      <div class="proposal" id="proposal"></div>
+    </section>
+
+    <footer>
+      <p>Herramienta orientada a borradores. Revise y adapte el texto antes de enviarlo al cliente. No compartas tu API key públicamente.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById("form");
+      var btn = document.getElementById("btnGenerar");
+      var loading = document.getElementById("loading");
+      var errorEl = document.getElementById("error");
+      var outputCard = document.getElementById("outputCard");
+      var proposalEl = document.getElementById("proposal");
+
+      /** Opcional: pega aquí tu clave si prefieres no escribirla cada vez (no subas este archivo a repositorios públicos). */
+      var GEMINI_API_KEY_DEFAULT = "AIzaSyDIzMpYQ1Bv8xYzc54u2n0tmFSulml3mhc";
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.classList.add("visible");
+      }
+
+      function clearError() {
+        errorEl.textContent = "";
+        errorEl.classList.remove("visible");
+      }
+
+      function escapeHtml(s) {
+        var div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function formatProposalAsParagraphs(text) {
+        var trimmed = text.trim();
+        var parts = trimmed.split(/\n\n+/).map(function (p) {
+          return p.trim();
+        }).filter(Boolean);
+        if (parts.length === 0) return "<p>" + escapeHtml(trimmed) + "</p>";
+        return parts.map(function (p) {
+          return "<p>" + escapeHtml(p).replace(/\n/g, "<br />") + "</p>";
+        }).join("");
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        clearError();
+        outputCard.classList.remove("visible");
+        proposalEl.innerHTML = "";
+
+        var cliente = document.getElementById("cliente").value.trim();
+        var industria = document.getElementById("industria").value.trim();
+        var problema = document.getElementById("problema").value.trim();
+        var apiKeyInput = document.getElementById("apiKey").value.trim();
+        var apiKey = apiKeyInput || GEMINI_API_KEY_DEFAULT;
+        var modelo = document.getElementById("modelo").value;
+
+        if (!cliente || !industria || !problema) {
+          showError("Completa el nombre del cliente, la industria y el problema principal.");
+          return;
+        }
+        if (!apiKey) {
+          showError("Indica tu API key de Gemini o configura GEMINI_API_KEY_DEFAULT en el script.");
+          return;
+        }
+
+        var userPrompt =
+          "Eres un consultor comercial senior. Redacta una propuesta comercial profesional en español, tono formal pero cercano, " +
+          "dirigida al cliente indicado. La propuesta debe constar exactamente de tres párrafos bien diferenciados:\n\n" +
+          "1) Primer párrafo: reconocimiento del contexto del cliente y del sector, demostrando que entiendes su realidad.\n" +
+          "2) Segundo párrafo: cómo tu enfoque o solución aborda el problema descrito y qué valor aporta (sin inventar cifras ni datos verificables concretos si no se dan).\n" +
+          "3) Tercer párrafo: siguiente paso sugerido (reunión, piloto, entrega de alcance) de forma clara y sin presión agresiva.\n\n" +
+          "No uses viñetas ni numeración en el texto final; solo tres párrafos en prosa. No incluyas título ni saludo tipo \"Estimado\"; empieza directamente con el primer párrafo.\n\n" +
+          "Datos:\n" +
+          "- Cliente o empresa: " + cliente + "\n" +
+          "- Industria o sector: " + industria + "\n" +
+          "- Problema principal: " + problema;
+
+        var url =
+          "https://generativelanguage.googleapis.com/v1beta/models/" +
+          encodeURIComponent(modelo) +
+          ":generateContent?key=" +
+          encodeURIComponent(apiKey);
+
+        var body = {
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: userPrompt }]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048
+          }
+        };
+
+        btn.disabled = true;
+        loading.classList.add("visible");
+
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        })
+          .then(function (res) {
+            return res.json().then(function (data) {
+              if (!res.ok) {
+                var msg =
+                  (data && data.error && data.error.message) ||
+                  "Error HTTP " + res.status;
+                throw new Error(msg);
+              }
+              return data;
+            });
+          })
+          .then(function (data) {
+            var text = "";
+            try {
+              var cand = data.candidates && data.candidates[0];
+              var parts = cand && cand.content && cand.content.parts;
+              if (parts && parts[0] && parts[0].text) text = parts[0].text;
+            } catch (err) {
+              /* ignore */
+            }
+            if (!text) {
+              throw new Error("La API no devolvió texto. Prueba otro modelo o revisa la respuesta en la consola.");
+            }
+            proposalEl.innerHTML = formatProposalAsParagraphs(text);
+            outputCard.classList.add("visible");
+            outputCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          })
+          .catch(function (err) {
+            showError(err.message || "No se pudo generar la propuesta.");
+          })
+          .finally(function () {
+            btn.disabled = false;
+            loading.classList.remove("visible");
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
